@@ -744,3 +744,22 @@ event: React.ChangeEvent<HTMLInputElement>
 4. **维护性**：在项目中，特别是在大型项目中，类型信息可以提供文档化的好处，使代码更易于维护和协作。
 
 如果你的项目是一个小型项目或你对类型不太关心，那么可以不写类型注解或声明，而是让JavaScript根据上下文进行类型推断。但在大型项目或需要更多类型安全性的情况下，编写类型注解或声明是一个好的实践，可以提高代码的可维护性和质量。
+
+
+
+
+
+# enum JavaScriptやTypeScriptのEnum（列挙型
+
+~~~typescript
+enum TabType {
+  CONTRACT = 0,
+  API,
+  LIMIT,
+}
+~~~
+
+これはTabTypeという新しいデータ型を作成し、その中にCONTRACT, API, LIMITという3つの値を割り当てています。それぞれの値は自動的に数字（通常は0から始まる整数）が割り当てられます。したがって、この場合ではCONTRACTは0、APIは1、LIMITは2に対応します。これは特定の状態やタイプの固定リストを持つのに役立ちます。
+
+
+
