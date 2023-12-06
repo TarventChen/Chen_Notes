@@ -614,8 +614,8 @@ username: "jamesbond007"
 ~~~jsx
 <div onClick={() =>{
         props.onChecked(props.id);
-  } }
-    </div>
+  } }>
+</div>
 ~~~
 
 # 防止页面刷新
@@ -763,3 +763,129 @@ enum TabType {
 
 
 
+
+
+# Math.ceil()
+
+**`Math.ceil()`** 関数は、引数として与えた数以上の最小の整数を返します。
+
+~~~js
+console.log(Math.ceil(0.95));
+// Expected output: 1
+
+console.log(Math.ceil(4));
+// Expected output: 4
+
+console.log(Math.ceil(7.004));
+// Expected output: 8
+
+console.log(Math.ceil(-7.004));
+// Expected output: -7
+
+~~~
+
+
+
+# useMemo
+
+实现分页使用了两种实现方式
+
+Nomel Way
+
+~~~jsx
+<TableBody>
+            {!usersQuery.isError &&
+            sortedUsers.slice((pageNumber-1)*NumberPerPage, pageNumber * NumberPerPage + NumberPerPage)
+            .map((user, index) => {
+              return (
+                <TableRow
+                  key={user.user_number}
+                  sx={{
+                    'cursor': (user.contractor || user.myself) ? undefined : 'pointer',
+                    'backgroundColor': (index % 2 === 0) ? 'secondary.main' : 'secondary.light',
+                    '&:hover': {
+                      'backgroundColor': '#efeef8',
+                    },
+                  }}
+                  onClick={() => {
+                    if (user.contractor || user.myself) return;
+                    handleToggleCheck(user.user_number);
+                  }}
+~~~
+
+useMemo  Way
+
+~~~jsx
+// ページング済みカメラ一覧,ページネーション
+  const pagedCameras = React.useMemo(() => {
+    const start = (pageNumber - 1) * NumberPerPage;
+    return sortedCameras.slice(start, start + NumberPerPage);
+  }, [sortedCameras, pageNumber]);
+~~~
+
+https://zh-hans.react.dev/reference/react/useMemo#usememo
+
+useMemo 它在每次重新渲染的时候能够缓存计算的结果。
+
+~~~jsx	
+import { useMemo } from 'react';
+function TodoList({ todos, tab }) {
+  const visibleTodos = useMemo(
+      () => filterTodos(todos, tab),
+       [todos, tab]
+  );
+  // ...
+}
+~~~
+
+## 参数 
+
+- `calculateValue`：要缓存计算值的函数。它应该是一个没有任何参数的纯函数，并且可以返回任意类型。React 将会在首次渲染时调用该函数；在之后的渲染中，如果 `dependencies` 没有发生变化，React 将直接返回相同值。否则，将会再次调用 `calculateValue` 并返回最新结果，然后缓存该结果以便下次重复使用。
+- `dependencies`：所有在 `calculateValue` 函数中使用的响应式变量组成的数组。响应式变量包括 props、state 和所有你直接在组件中定义的变量和函数。如果你在代码检查工具中 [配置了 React](https://zh-hans.react.dev/learn/editor-setup#linting)，它将会确保每一个响应式数据都被正确地定义为依赖项。依赖项数组的长度必须是固定的并且必须写成 `[dep1, dep2, dep3]` 这种形式。React 使用 [`Object.is`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/is) 将每个依赖项与其之前的值进行比较。
+
+
+
+## 返回值 
+
+在初次渲染时，`useMemo` 返回不带参数调用 `calculateValue` 的结果。
+
+在接下来的渲染中，如果依赖项没有发生改变，它将返回上次缓存的值；否则将再次调用 `calculateValue`，并返回最新结果。
+
+## Use
+
+你需要给 `useMemo` 传递两样东西：
+
+1. 一个没有任何参数的 calculation 函数，像这样 `() =>`，并且返回任何你想要的计算结果。
+2. 一个由包含在你的组件中并在 calculation 中使用的所有值组成的 依赖列表。
+
+在初次渲染时，你从 `useMemo` 得到的 值 将会是你的 calculation 函数执行的结果。
+
+在随后的每一次渲染中，React 将会比较前后两次渲染中的 所有依赖项 是否相同。如果通过 [`Object.is`](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Object/is) 比较所有依赖项都没有发生变化，那么 `useMemo` 将会返回之前已经计算过的那个值。否则，React 将会重新执行 calculation 函数并且返回一个新的值。
+
+
+
+### 注意
+
+**你应该仅仅把 `useMemo` 作为性能优化的手段**。如果没有它，你的代码就不能正常工作，那么请先找到潜在的问题并修复它。然后再添加 `useMemo` 以提高性能。
+
+
+
+
+
+
+
+## React.memo 的运行机制
+
+可以在合适的时候使用它来提升性能。
+
+当想要避免子组件不必要的重新渲染（即便父组件发生了更改），你可以使用 `React.memo` 打包子组件 – 只要 props 不发生改变，就不会重复渲染。**请注意此处是引用相等**（译者注：沿用了旧版本 React 的[“浅比较”](https://reactjs.org/docs/shallow-compare.html)）——子组件不会被重新渲染。
+
+```javascript
+import { memo } from 'react';
+
+const ChildComponent = (props) => {
+  // ...
+};
+
+export default memo(ChildComponent);
+```

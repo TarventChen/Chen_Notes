@@ -1,1 +1,0 @@
-# NoteForWork  in Panasonic
